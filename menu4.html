@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+    <div class="container">
+      <div id="cajaEstilos">
+        
+        <div div class="d-md-block" id="estilo1">        
+          <button type="button" class="boton1 btn btn-primary m-2" onclick="guardarEstilo(1)"><i class="bi bi-plus-circle"></i></button>
+          <button type="button" class="boton1 btn btn-primary" onclick="google.script.run.aplicarEstilo(1)">Aplicar estilo</button>        
+        </div>
+        
+        <div div class="d-md-block" id="estilo2">        
+          <button type="button" class="boton2 btn btn-primary m-2" onclick="guardarEstilo(2)"><i class="bi bi-plus-circle"></i></button>
+          <button type="button" class="boton2 btn btn-primary" onclick="google.script.run.aplicarEstilo(2)">Aplicar estilo</button>        
+        </div>
+      </div>    
+        
+        <div class="d-grid gap-2 col-6 mx-auto">
+          <br>
+          <button type="button" class="btn btn-success" onclick="agregarEstilo()"><i class="bi bi-plus-circle"></i></button>
+          <button type="button" class="btn btn-primary" onclick="google.script.run.borrarEstilos()">Borrar estilos</button>    
+          <button type="button" class="btn btn-primary" onclick="google.script.run.borrarTodo()">Borrar todo</button>
+        </div>
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+    <script>
+
+    /*
+    const botonesGrupo = document.querySelectorAll('.btn');
+    let botonActivo = null;
+    botonesGrupo.forEach(boton => {
+      boton.addEventListener('click', () => {
+        if (botonActivo !== null) {
+          botonActivo.classList.remove('active');
+        }
+        boton.classList.add('active');
+        botonActivo = boton;
+      });
+    });
+    */
+    //cantidad estilos iniciales
+    var estiloActual = 3
+
+    function agregarEstilo(){
+      //crear id con id del estilo
+      let div = document.createElement('div')
+      div.id = 'estilo' +estiloActual
+      const numEstiloActual = estiloActual
+      estiloActual++
+
+      //boton aplicar estilo
+      let boton = document.createElement('button')
+      boton.classList.add('boton' +numEstiloActual,'btn', 'btn-primary', 'm-2')
+      boton.textContent = 'Aplicar estilo' +numEstiloActual
+      boton.onclick = () => google.script.run.aplicarEstilo(numEstiloActual)
+
+      //boton guardar estilo
+      let botonPlus = document.createElement('button')
+      botonPlus.classList.add('boton' +numEstiloActual,'btn', 'btn-primary')      
+      botonPlus.onclick = () => {
+                                  google.script.run.withSuccessHandler(
+                                    function(obj){
+                                      let botones = document.querySelectorAll('.boton' +numEstiloActual)
+                                      Array.from(botones).forEach(boton => {
+                                        boton.style.backgroundColor = obj.colorFondo
+                                      })
+                                    }
+                                  ).guardarEstilo(numEstiloActual)
+                                }
+      //boton borrar estilo
+      let botonBorrar = document.createElement('button')
+      botonBorrar.classList.add('btn', 'btn-danger')
+      botonBorrar.onclick = () => {
+                                    document.getElementById('estilo' +numEstiloActual).remove()
+                                    google.script.run.eliminarEstilo(numEstiloActual)
+                                  }
+      //icono +
+      let iconoPlus = document.createElement('i')
+      iconoPlus.classList.add('bi', 'bi-plus-circle')
+
+      //icono borrar
+      let iconoBorrar = document.createElement('i')
+      iconoBorrar.classList.add('bi','bi-trash-fill')
+
+      //agregar iconos a los botones
+      botonBorrar.appendChild(iconoBorrar)
+      botonPlus.appendChild(iconoPlus)
+      //agregar elementos al div
+      div.appendChild(botonPlus)
+      div.appendChild(boton)
+      div.appendChild(botonBorrar)
+      //agregar div al div id caja estilos
+      document.getElementById('cajaEstilos').appendChild(div)
+
+    }
+    
+    function guardarEstilo(numEstilo){
+
+      google.script.run.withSuccessHandler(
+        function(obj){
+          let botones = document.querySelectorAll('.boton' +numEstilo)
+          Array.from(botones).forEach(boton => {
+            boton.style.backgroundColor = obj.colorFondo
+          })
+        }
+      ).guardarEstilo(numEstilo)
+    }
+
+    window.onload = function(){
+      
+      google.script.run.withSuccessHandler(
+        function(obj){
+          console.log({obj})
+          Object.keys(obj).forEach(propiedad => {
+            //si es el color de fondo
+            if(propiedad.slice(0,10) == 'colorFondo'){
+              let botones = document.querySelectorAll('.boton' +propiedad.slice(10))
+              Array.from(botones).forEach(boton => boton.style.backgroundColor = obj[propiedad])
+            }
+          })          
+        }
+      ).cargarEstilos()
+    }
+
+    </script>
+</body>
